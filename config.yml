@@ -1,0 +1,6 @@
+logging:
+  level: INFO
+  loggers:
+    com.github.avchu: DEBUG
+stunHost: 192.168.88.212
+stunPort: 19302
