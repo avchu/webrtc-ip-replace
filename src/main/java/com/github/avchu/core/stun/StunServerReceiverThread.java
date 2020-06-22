@@ -36,7 +36,7 @@ public class StunServerReceiverThread extends Thread {
             try {
                 DatagramPacket receive = new DatagramPacket(new byte[200], 200);
                 receiverSocket.receive(receive);
-                logger.debug(
+                logger.info(
                         receiverSocket.getLocalAddress().getHostAddress() +
                                 ":" + receiverSocket.getLocalPort() +
                                 " datagram received from " +
