@@ -1,0 +1,6 @@
+version: '2.1'
+services:
+  bot:
+    image: maven
+    volumes:
+      - ../../webrtc-ip-replace/:/opt/data

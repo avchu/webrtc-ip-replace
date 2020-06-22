@@ -3,7 +3,6 @@ package com.github.avchu.core.stun;
 import com.github.avchu.core.IPBean;
 import de.javawi.jstun.attribute.MappedAddress;
 import de.javawi.jstun.attribute.MessageAttributeException;
-import de.javawi.jstun.attribute.MessageAttributeParsingException;
 import de.javawi.jstun.attribute.UnknownAttribute;
 import de.javawi.jstun.attribute.UnknownMessageAttributeException;
 import de.javawi.jstun.header.MessageHeader;
