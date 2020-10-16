@@ -5,7 +5,8 @@ public class IPBean {
 
     private static IPBean ipBeanInstance = new IPBean();
 
-    private IPBean() { }
+    private IPBean() {
+    }
 
     public static IPBean getIpBeanInstance() {
         return ipBeanInstance;

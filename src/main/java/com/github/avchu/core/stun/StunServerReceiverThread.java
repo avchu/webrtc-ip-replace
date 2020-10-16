@@ -32,7 +32,7 @@ public class StunServerReceiverThread extends Thread {
     }
 
     public void run() {
-        while (doRun) {
+        while (true) {
             try {
                 DatagramPacket receive = new DatagramPacket(new byte[200], 200);
                 receiverSocket.receive(receive);
@@ -83,7 +83,6 @@ public class StunServerReceiverThread extends Thread {
                 ioe.printStackTrace();
             }
         }
-        receiverSocket.close();
     }
 
     public void stopStunServer() {
