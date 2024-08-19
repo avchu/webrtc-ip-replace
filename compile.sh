@@ -4,4 +4,6 @@ sdk install java 8.0.422-amzn
 sdk install maven
 cd webrtc-ip-replace
 sdk use java 8.0.422-amzn
+ls -la /root/.sdkman/candidates/java/8.0.422-amzn/bin/
+ls -la /root/.sdkman/candidates/java/8.0.422-amzn/
 mvn clean install
