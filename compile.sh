@@ -1,5 +1,5 @@
 #!/bin/bash
-source /root/.sdkman/bin/sdkman-init.sh
+source /home/chrome/.sdkman/bin/sdkman-init.sh
 sdk install java 17.0.12-tem
 sdk install maven
 sdk use java 17.0.12-tem
