@@ -1,22 +1,26 @@
 package com.github.avchu.core;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class IPBean {
-    private String ip;
 
-    private static IPBean ipBeanInstance = new IPBean();
+  ConcurrentHashMap<String, String> ipHashMap = new ConcurrentHashMap<>();
+  private String ip;
 
-    private IPBean() {
-    }
+  private static IPBean ipBeanInstance = new IPBean();
 
-    public static IPBean getIpBeanInstance() {
-        return ipBeanInstance;
-    }
+  private IPBean() {
+  }
 
-    public String getIp() {
-        return ip;
-    }
+  public static IPBean getIpBeanInstance() {
+    return ipBeanInstance;
+  }
 
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
+  public String getIp(String realIp) {
+    return this.ipHashMap.get(realIp);
+  }
+
+  public void setIp(String realId, String ip) {
+    this.ipHashMap.put(realId, ip);
+  }
 }

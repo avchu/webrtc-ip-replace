@@ -10,82 +10,85 @@ import de.javawi.jstun.header.MessageHeaderInterface;
 import de.javawi.jstun.header.MessageHeaderParsingException;
 import de.javawi.jstun.util.Address;
 import de.javawi.jstun.util.UtilityException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StunServerReceiverThread extends Thread {
-    Logger logger = LoggerFactory.getLogger(StunServerReceiverThread.class);
-    private Boolean doRun = true;
 
-    private DatagramSocket receiverSocket;
+  Logger logger = LoggerFactory.getLogger(StunServerReceiverThread.class);
+  private Boolean doRun = true;
 
-    private IPBean ipBean;
+  private DatagramSocket receiverSocket;
 
-    public StunServerReceiverThread(DatagramSocket receiverSocket, IPBean ipBeanInstance) {
-        this.receiverSocket = receiverSocket;
-        this.ipBean = ipBeanInstance;
-    }
+  private IPBean ipBean;
 
-    public void run() {
-        while (true) {
-            try {
-                DatagramPacket receive = new DatagramPacket(new byte[200], 200);
-                receiverSocket.receive(receive);
-                logger.info(
-                        receiverSocket.getLocalAddress().getHostAddress() +
-                                ":" + receiverSocket.getLocalPort() +
-                                " datagram received from " +
-                                receive.getAddress().getHostAddress() + ":" +
-                                receive.getPort());
+  public StunServerReceiverThread(DatagramSocket receiverSocket, IPBean ipBeanInstance) {
+    this.receiverSocket = receiverSocket;
+    this.ipBean = ipBeanInstance;
+  }
 
-                MessageHeader receiveMH = MessageHeader.parseHeader(receive.getData());
-                try {
-                    receiveMH.parseAttributes(receive.getData());
-                    if (receiveMH.getType() == MessageHeaderInterface.MessageHeaderType.BindingRequest) {
-                        MessageHeader sendMH = new MessageHeader(MessageHeaderInterface.MessageHeaderType.BindingResponse);
-                        sendMH.setTransactionID(receiveMH.getTransactionID());
-                        MappedAddress responseAddress = new MappedAddress();
-                        responseAddress.setAddress(new Address(ipBean.getIp()));
-                        responseAddress.setPort(12121);
-                        sendMH.addMessageAttribute(responseAddress);
-                        byte[] data = sendMH.getBytes();
-                        DatagramPacket send = new DatagramPacket(data, data.length);
-                        send.setPort(receive.getPort());
-                        send.setAddress(receive.getAddress());
-                        receiverSocket.send(send);
-                    }
-                } catch (UnknownMessageAttributeException umae) {
-                    umae.printStackTrace();
-                    MessageHeader sendMH = new MessageHeader(MessageHeaderInterface.MessageHeaderType.BindingErrorResponse);
-                    sendMH.setTransactionID(receiveMH.getTransactionID());
-                    UnknownAttribute ua = new UnknownAttribute();
-                    ua.addAttribute(umae.getType());
-                    sendMH.addMessageAttribute(ua);
+  public void run() {
+    while (true) {
+      try {
+        DatagramPacket receive = new DatagramPacket(new byte[200], 200);
+        receiverSocket.receive(receive);
+        logger.info(
+            receiverSocket.getLocalAddress().getHostAddress() +
+                ":" + receiverSocket.getLocalPort() +
+                " datagram received from " +
+                receive.getAddress().getHostAddress() + ":" +
+                receive.getPort());
 
-                    byte[] data = sendMH.getBytes();
-                    DatagramPacket send = new DatagramPacket(data, data.length);
-                    send.setPort(receive.getPort());
-                    send.setAddress(receive.getAddress());
-                    receiverSocket.send(send);
-                }
-            } catch (SocketTimeoutException ioe) {
-                // No data for SO_TIMEOUT milliseconds.
-            } catch (IOException |
-                    MessageHeaderParsingException |
-                    UtilityException |
-                    MessageAttributeException |
-                    ArrayIndexOutOfBoundsException ioe) {
-                ioe.printStackTrace();
-            }
+        MessageHeader receiveMH = MessageHeader.parseHeader(receive.getData());
+        try {
+          receiveMH.parseAttributes(receive.getData());
+          if (receiveMH.getType() == MessageHeaderInterface.MessageHeaderType.BindingRequest) {
+            MessageHeader sendMH = new MessageHeader(
+                MessageHeaderInterface.MessageHeaderType.BindingResponse);
+            sendMH.setTransactionID(receiveMH.getTransactionID());
+            MappedAddress responseAddress = new MappedAddress();
+            responseAddress.setAddress(
+                new Address(ipBean.getIp(receiverSocket.getLocalAddress().getHostAddress())));
+            responseAddress.setPort(12121);
+            sendMH.addMessageAttribute(responseAddress);
+            byte[] data = sendMH.getBytes();
+            DatagramPacket send = new DatagramPacket(data, data.length);
+            send.setPort(receive.getPort());
+            send.setAddress(receive.getAddress());
+            receiverSocket.send(send);
+          }
+        } catch (UnknownMessageAttributeException umae) {
+          umae.printStackTrace();
+          MessageHeader sendMH = new MessageHeader(
+              MessageHeaderInterface.MessageHeaderType.BindingErrorResponse);
+          sendMH.setTransactionID(receiveMH.getTransactionID());
+          UnknownAttribute ua = new UnknownAttribute();
+          ua.addAttribute(umae.getType());
+          sendMH.addMessageAttribute(ua);
+
+          byte[] data = sendMH.getBytes();
+          DatagramPacket send = new DatagramPacket(data, data.length);
+          send.setPort(receive.getPort());
+          send.setAddress(receive.getAddress());
+          receiverSocket.send(send);
         }
+      } catch (SocketTimeoutException ioe) {
+        // No data for SO_TIMEOUT milliseconds.
+      } catch (IOException |
+               MessageHeaderParsingException |
+               UtilityException |
+               MessageAttributeException |
+               ArrayIndexOutOfBoundsException ioe) {
+        ioe.printStackTrace();
+      }
     }
+  }
 
-    public void stopStunServer() {
-        this.doRun = false;
-    }
+  public void stopStunServer() {
+    this.doRun = false;
+  }
 }
